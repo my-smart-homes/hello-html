@@ -1,4 +1,4 @@
-name: Change a workflow file
+name: Change a workflow file v2
 
 on:
   workflow_dispatch: # To allow manual triggering of the action
@@ -15,7 +15,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4.1.1
         with:
-          token: ${{ secrets.PAT_TOKEN }} # Fine-grained PAT with contents:write and workflows:write scopes
+          token: ${{ secrets.WORKFLOW_TOKEN }} # Fine-grained PAT with contents:write and workflows:write scopes
 
       - name: Make change to workflow file
         run: |
