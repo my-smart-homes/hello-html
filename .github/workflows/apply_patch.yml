@@ -23,11 +23,12 @@ jobs:
             runs-on: ubuntu-latest
 
             steps:
-              # Step 1: Check out the code from your forked repository
-              - name: Check out forked repository
-                uses: actions/checkout@v2
+              - name: Check out repository
+                uses: actions/checkout@v4.1.1
                 with:
-                  ref: main
+                  # Fine-grained PAT with contents:write and workflows:write
+                  # scopes
+                  token: ${{ secrets.WORKFLOW_TOKEN }}
 
               # Step 2: Add the original repository as upstream and hard reset
               - name: Set up original repository as upstream and hard reset
@@ -87,4 +88,4 @@ jobs:
           git add .
           git commit -m "Sync and replace NaimurDev with MySmartHomes, restore sync.yml"
           # Push using the PAT explicitly
-          git push https://x-access-token:${TOKEN}@github.com/my-smart-homes/hello-html.git main --force
+          git push https://github.com/my-smart-homes/hello-html.git main --force
