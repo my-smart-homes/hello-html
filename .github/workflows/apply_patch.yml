@@ -1,10 +1,7 @@
-name: Sync with Original and Modify v7
+name: Change a workflow file
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight (adjust as needed)
   workflow_dispatch: # To allow manual triggering of the action
-
 
 jobs:
   changewf:
@@ -18,12 +15,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4.1.1
         with:
-          # Fine-grained PAT with contents:write and workflows:write
-          # scopes
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }} # Fine-grained PAT with contents:write and workflows:write scopes
 
       - name: Make change to workflow file
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           # Create new branch
           git switch -c "feature"
@@ -32,16 +26,16 @@ jobs:
           echo "# I am a change!" >> .github/workflows/workflow.yml
 
           git config --global user.name "github-actions"
-          git config --global user.email \
-              "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .github/workflows/workflow.yml
           git commit --message "Update workflow"
 
-          # This authenticates with WORKFLOW_TOKEN, because it was
-          # used with the checkout action
+          # Push the branch to origin
           git push --set-upstream origin "feature"
-          
-          # This authenticates with GITHUB_TOKEN, using the scopes
-          # set in jobs.changewf.permissions
-          gh pr create --title "Update workflow" --body ''
+
+      - name: Create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --title "Update workflow" --body "Automated update to the workflow file" --head "feature" --base "main"
