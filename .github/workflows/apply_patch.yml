@@ -75,7 +75,7 @@ jobs:
       - name: Restore sync.yml
         run: |
           mkdir -p .github/workflows
-          echo "$SYNC_YML" > .github/workflows/sync.yml
+          echo "$SYNC_YML" > .github/workflows/apply_patch.yml
 
       # Step 5: Force push changes using PAT
       - name: Commit and force push changes with PAT
