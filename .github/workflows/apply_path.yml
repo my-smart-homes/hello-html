@@ -1,0 +1,90 @@
+name: Sync with Original and Modify v6
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight (adjust as needed)
+  workflow_dispatch: # To allow manual triggering of the action
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    env:
+      SYNC_YML: |
+        name: Sync with Original and Modify v6
+
+        on:
+          schedule:
+            - cron: '0 0 * * *' # Runs every day at midnight (adjust as needed)
+          workflow_dispatch: # To allow manual triggering of the action
+
+        jobs:
+          sync:
+            runs-on: ubuntu-latest
+
+            steps:
+              # Step 1: Check out the code from your forked repository
+              - name: Check out forked repository
+                uses: actions/checkout@v2
+                with:
+                  ref: main
+
+              # Step 2: Add the original repository as upstream and hard reset
+              - name: Set up original repository as upstream and hard reset
+                run: |
+                  git remote add upstream https://github.com/NaimurDev/hello-html.git
+                  git fetch upstream
+                  git checkout main
+                  git reset --hard upstream/main
+
+              # Step 3: Run script to modify content (replace 'NaimurDev' with 'MySmartHomes')
+              - name: Replace text in files
+                run: |
+                  find . -type f -exec sed -i 's/NaimurDev/MySmartHomes/g' {} \;
+
+              # Step 4: Force push changes
+              - name: Commit and force push changes
+                run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add .
+                  git commit -m "Sync and replace NaimurDev with MySmartHomes"
+                  git push origin main --force
+
+    steps:
+      # Step 1: Check out the code from your forked repository
+      - name: Check out forked repository
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      # Step 2: Add the original repository as upstream and hard reset
+      - name: Set up original repository as upstream and hard reset
+        run: |
+          git remote add upstream https://github.com/NaimurDev/hello-html.git
+          git fetch upstream
+          git checkout main
+          git reset --hard upstream/main
+
+      # Step 3: Run script to modify content (replace 'NaimurDev' with 'MySmartHomes')
+      - name: Replace text in files
+        run: |
+          find . -type f -exec sed -i 's/NaimurDev/MySmartHomes/g' {} \;
+
+      # Step 4: Restore the sync.yml file from environment variable
+      - name: Restore sync.yml
+        run: |
+          mkdir -p .github/workflows
+          echo "$SYNC_YML" > .github/workflows/sync.yml
+
+      # Step 5: Force push changes using PAT
+      - name: Commit and force push changes with PAT
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN }}  # Use the PAT token stored in secrets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Sync and replace NaimurDev with MySmartHomes, restore sync.yml"
+          # Push using the PAT explicitly
+          git push https://x-access-token:${TOKEN}@github.com/my-smart-homes/hello-html.git main --force
